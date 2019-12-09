@@ -11,7 +11,7 @@ entries:
       url: /
     - output: web,pdf
       title: Title
-      url: /utils
+      url: /prep
     output: web
     title: hybrec
   output: web
