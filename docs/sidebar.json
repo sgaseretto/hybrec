@@ -1,6 +1,7 @@
 {
   "hybrec": {
     "Overview": "/",
-    "Title": "/prep"
+    "Title": "/utils",
+    "Dataset Preparation Funcions": "/prep"
   }
 }

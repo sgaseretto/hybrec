@@ -11,6 +11,9 @@ entries:
       url: /
     - output: web,pdf
       title: Title
+      url: /utils
+    - output: web,pdf
+      title: Dataset Preparation Funcions
       url: /prep
     output: web
     title: hybrec

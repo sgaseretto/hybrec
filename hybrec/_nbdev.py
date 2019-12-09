@@ -2,9 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {}
+index = {"get_uniques": "03_prep.ipynb"}
 
-modules = []
+modules = ["prep.py"]
 
 git_url = "https://github.com/sgaseretto/hybrec/tree/master/"
 
