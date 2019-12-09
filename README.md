@@ -14,7 +14,7 @@
 > Library to build and test Hybrid Recommender Systems
 
 
-This file will become your README and also the index of your documentation.
+Check the docs [here](https://sgaseretto.github.io/hybrec/prep)
 
 ## Install
 
