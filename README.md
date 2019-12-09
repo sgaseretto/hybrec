@@ -1,4 +1,4 @@
-# nbdev template
+# HybRec
 
-Use this template to more easily create your nbdev project.
+Library to build and test Hybrid Recommender Systems
 
