@@ -1,7 +1,8 @@
 {
   "hybrec": {
     "Overview": "/",
-    "Title": "/utils",
-    "Dataset Preparation Funcions": "/prep"
+    "module name here": "core.html",
+    "Title": "utils.html",
+    "Dataset Preparation Funcions": "prep.html"
   }
 }

@@ -1,8 +1,8 @@
 topnav:
 - title: Topnav
   items:
-    - title: GitHub
-      external_url: https://github.com/sgaseretto/hybrec
+    - title: github
+      external_url: https://github.com/sgaseretto/hybrec/tree/master/
 
 #Topnav dropdowns
 topnav_dropdowns:

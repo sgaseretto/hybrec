@@ -2,8 +2,10 @@ repository: sgaseretto/hybrec
 output: web
 topnav_title: hybrec
 site_title: hybrec
-company_name: AWI
-description: Library to build and test Hybrid Recommender Systems
+company_name: AITI Solutions
+description: Hybrid Recommender System
+# Set to false to disable KaTeX math
+use_math: true
 # Add Google analytics id if you have one and want to use it here
 google_analytics:
 # See http://nbdev.fast.ai/search for help with adding Search
@@ -58,3 +60,4 @@ sidebars:
 - home_sidebar
 
 theme: jekyll-theme-cayman
+baseurl: /hybrec/
