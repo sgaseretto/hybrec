@@ -1,12 +1,12 @@
-# Project name here
-> Summary description here.
+# HybRec
+> Hybrid Recommender System with FastAI.
 
 
-This file will become your README and also the index of your documentation.
+Hybrid Recommender system build on top of FastAI, based on [LightFM](https://making.lyst.com/lightfm/docs/index.html)
 
 ## Install
 
-`pip install your_project_name`
+`pip install hybrec`
 
 ## How to use
 
