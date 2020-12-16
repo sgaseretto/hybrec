@@ -8,7 +8,12 @@ index = {"SynthDataset": "01_synth_dataset.ipynb",
          "exclude_element": "01_synth_dataset.ipynb",
          "build_interactions": "01_synth_dataset.ipynb",
          "build_features_from_df": "01_synth_dataset.ipynb",
+         "SynthDataset.add_user_metadata": "01_synth_dataset.ipynb",
+         "SynthDataset.add_item_metadata": "01_synth_dataset.ipynb",
          "SynthDataset.build_synth_dataset": "01_synth_dataset.ipynb",
+         "SynthDataset.build_user_item_interactions": "01_synth_dataset.ipynb",
+         "df_highlight_interaction": "01_synth_dataset.ipynb",
+         "df_color_positive_interaction": "01_synth_dataset.ipynb",
          "get_uniques": "04_prep.ipynb"}
 
 modules = ["synth.py",
