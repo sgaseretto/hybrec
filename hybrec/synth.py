@@ -161,7 +161,7 @@ def gen_users_n_items(self:SynthDataset,
     self.all_items = gen_values(n_values=n_items, prefix='i')
 
 @patch
-def gen_metadata(self:SynthDataset, n_user_metadata, n_item_metadata):
+def gen_metadata(self:SynthDataset, n_user_metadata:int, n_item_metadata:int):
     '''
     Generates metadata for users and items
     '''
@@ -184,9 +184,20 @@ def print_dataset_components(self:SynthDataset,
         if add_user_metadata: print('added user features: {}\t deleted user features: {}'.format(self.added_user_metadata, self.deleted_user_metadata))
         if add_item_metadata: print('added item features: {}\t deleted item features: {}'.format(self.added_item_metadata, self.deleted_item_metadata))
 
-
-
-
+@patch
+def gen_before_n_after_datasets(self:SynthDataset):
+    '''
+    Generates first and second state from the dataset. before is the dataset that
+    contains the users and items at time T and after is the dataset at time T+1
+    where some users and items were deleted and new ones were added
+    '''
+    try:
+        self.before['user_id'] = exclude_element(self.all_users, self.users_added)
+        self.before['item_id'] = exclude_element(self.all_items, self.items_added)
+        self.after['user_id'] = exclude_element(self.all_users, self.users_deleted)
+        self.after['item_id'] = exclude_element(self.all_items, self.items_deleted)
+    except:
+        print('One of the elements was empty')
 
 # Cell
 @patch
@@ -225,10 +236,7 @@ def build_synth_dataset(self:SynthDataset,
                                                                max_added=max_added,
                                                                max_deleted=max_deleted)
 
-    self.before['user_id'] = exclude_element(self.all_users, self.users_added)
-    self.before['item_id'] = exclude_element(self.all_items, self.items_added)
-    self.after['user_id'] = exclude_element(self.all_users, self.users_deleted)
-    self.after['item_id'] = exclude_element(self.all_items, self.items_deleted)
+    self.gen_before_n_after_datasets()
 
     if add_user_metadata: self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata,
                                                                                    max_added=max_added,
