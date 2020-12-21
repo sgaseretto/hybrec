@@ -162,8 +162,31 @@ def gen_users_n_items(self:SynthDataset,
 
 @patch
 def gen_metadata(self:SynthDataset, n_user_metadata, n_item_metadata):
+    '''
+    Generates metadata for users and items
+    '''
     self.all_user_metadata = gen_values(n_values=n_user_metadata, prefix='uf')
     self.all_item_metadata = gen_values(n_values=n_item_metadata, prefix='if')
+
+@patch
+def print_dataset_components(self:SynthDataset,
+                             print_added_n_deleted:bool,
+                             add_user_metadata:bool,
+                             add_item_metadata:bool):
+    '''
+    Prints the Dataset components
+    '''
+    if print_added_n_deleted:
+        print('added users: {}\t deleted users: {}'.format(self.users_added, self.users_deleted))
+        print('added items: {}\t deleted items: {}'.format(self.items_added, self.items_deleted))
+        print('users before:\t{}\nusers after:\t{}'.format(self.before['user_id'], self.after['user_id']))
+        print('items before:\t{}\nitems after:\t{}'.format(self.before['item_id'], self.after['item_id']))
+        if add_user_metadata: print('added user features: {}\t deleted user features: {}'.format(self.added_user_metadata, self.deleted_user_metadata))
+        if add_item_metadata: print('added item features: {}\t deleted item features: {}'.format(self.added_item_metadata, self.deleted_item_metadata))
+
+
+
+
 
 # Cell
 @patch
@@ -185,34 +208,36 @@ def build_synth_dataset(self:SynthDataset,
     and their metadata could be also updated (new metadata that expresses better the characteristics from that item, or just corrections)
     '''
 
-#     self.all_users = gen_values(n_values=n_users, prefix='u')
-#     self.all_items = gen_values(n_values=n_items, prefix='i')
+    # Generates all the possible users and items
     self.gen_users_n_items(n_users=n_users, n_items=n_items)
-#     self.all_user_features = gen_values(prefix='uf')
-#     self.all_item_features = gen_values(prefix='if')
+    # Generates all the posible metadata values for users and items
     self.gen_metadata(n_user_metadata=n_user_metadata, n_item_metadata=n_item_metadata)
 
-    self.users_added, self.users_deleted = gen_added_n_deleted(self.all_users, max_added=max_added, max_deleted=max_deleted)
-    if print_added_n_deleted: print('added users: {}\t deleted users: {}'.format(self.users_added, self.users_deleted))
+    # Builds two groups of users, the ones that will be added to the system
+    # and the ones that requested to be deleted from the system
+    self.users_added, self.users_deleted = gen_added_n_deleted(self.all_users,
+                                                               max_added=max_added,
+                                                               max_deleted=max_deleted)
 
-    self.items_added, self.items_deleted = gen_added_n_deleted(self.all_items, max_added=max_added, max_deleted=max_deleted)
-    if print_added_n_deleted: print('added items: {}\t deleted items: {}'.format(self.items_added, self.items_deleted))
+    # Builds two groups of items, the ones that will be added to the system
+    # and the ones that requested to be deleted from the system
+    self.items_added, self.items_deleted = gen_added_n_deleted(self.all_items,
+                                                               max_added=max_added,
+                                                               max_deleted=max_deleted)
 
     self.before['user_id'] = exclude_element(self.all_users, self.users_added)
     self.before['item_id'] = exclude_element(self.all_items, self.items_added)
     self.after['user_id'] = exclude_element(self.all_users, self.users_deleted)
     self.after['item_id'] = exclude_element(self.all_items, self.items_deleted)
 
-    if print_added_n_deleted: print('users before:\t{}\nusers after:\t{}'.format(self.before['user_id'], self.after['user_id']))
-    if print_added_n_deleted: print('items before:\t{}\nitems after:\t{}'.format(self.before['item_id'], self.after['item_id']))
+    if add_user_metadata: self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata,
+                                                                                   max_added=max_added,
+                                                                                   max_deleted=max_deleted)
 
-    if add_user_metadata:
-        self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata, max_added=max_added, max_deleted=max_deleted)
-        if print_added_n_deleted: print('added user features: {}\t deleted user features: {}'.format(self.added_user_metadata, self.deleted_user_metadata))
-
-    if add_item_metadata:
-        self.added_item_metadata, self.deleted_item_metadata = gen_added_n_deleted(self.all_item_metadata, max_added=max_added, max_deleted=max_deleted)
-        if print_added_n_deleted: print('added item features: {}\t deleted item features: {}'.format(self.added_item_metadata, self.deleted_item_metadata))
+    if add_item_metadata: self.added_item_metadata, self.deleted_item_metadata = gen_added_n_deleted(self.all_item_metadata,
+                                                                                   max_added=max_added,
+                                                                                   max_deleted=max_deleted)
+    self.print_dataset_components(print_added_n_deleted, add_user_metadata, add_item_metadata)
 
 
 # Cell
