@@ -3,8 +3,6 @@
     "Overview": "/",
     "module name here": "core.html",
     "Synth Dataset Generator": "synth_dataset.html",
-    "Tests to see how to re-map users and items": "test_mockdatasets.html",
-    "Title": "embeddingbag.html",
-    "Dataset Preparation Funcions": "prep.html"
+    "Tests to see how to re-map users and items": "test_mockdatasets.html"
   }
 }

@@ -18,12 +18,6 @@ entries:
     - output: web,pdf
       title: Tests to see how to re-map users and items
       url: test_mockdatasets.html
-    - output: web,pdf
-      title: Title
-      url: embeddingbag.html
-    - output: web,pdf
-      title: Dataset Preparation Funcions
-      url: prep.html
     output: web
     title: hybrec
   output: web
