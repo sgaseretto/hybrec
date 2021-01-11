@@ -2,7 +2,8 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"SynthDatasetGenerator": "01_synth_dataset.ipynb",
+index = {"df_highlight_interaction": "01_synth_dataset.ipynb",
+         "df_color_positive_interaction": "01_synth_dataset.ipynb",
          "gen_values": "01_synth_dataset.ipynb",
          "gen_added_n_deleted": "01_synth_dataset.ipynb",
          "exclude_element": "01_synth_dataset.ipynb",
@@ -10,6 +11,7 @@ index = {"SynthDatasetGenerator": "01_synth_dataset.ipynb",
          "gen_random_interactions": "01_synth_dataset.ipynb",
          "gen_fixed_interactions": "01_synth_dataset.ipynb",
          "gen_metadata_from_df": "01_synth_dataset.ipynb",
+         "SynthDatasetGenerator": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.add_user_metadata": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.add_item_metadata": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.gen_users_n_items": "01_synth_dataset.ipynb",
@@ -18,8 +20,6 @@ index = {"SynthDatasetGenerator": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.gen_before_n_after_datasets": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.gen_synth_dataset": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.gen_user_item_interactions": "01_synth_dataset.ipynb",
-         "df_highlight_interaction": "01_synth_dataset.ipynb",
-         "df_color_positive_interaction": "01_synth_dataset.ipynb",
          "SynthDatasetGenerator.top_interactions_crosstab": "01_synth_dataset.ipynb"}
 
 modules = ["synth.py"]
