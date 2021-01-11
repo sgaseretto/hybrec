@@ -189,7 +189,7 @@ class SynthDatasetGenerator():
 # Cell
 
 @patch
-def add_user_metadata(self: SynthDatasetGenerator):
+def add_user_metadata(self: SynthDatasetGenerator, sparsity=0.5, fixed_length=None):
     '''
     Adds metadata to the users
     '''
@@ -199,7 +199,8 @@ def add_user_metadata(self: SynthDatasetGenerator):
             all_user_metadata,
             l1_col_name='user_id',
             l2_col_name='metadata_id',
-            sparsity=0.5
+            sparsity=sparsity,
+            fixed_length=fixed_length
         ),
         element_id_column='user_id',
         feature_column='metadata_id'
@@ -207,7 +208,7 @@ def add_user_metadata(self: SynthDatasetGenerator):
     return users_metadata
 
 @patch
-def add_item_metadata(self: SynthDatasetGenerator):
+def add_item_metadata(self: SynthDatasetGenerator, sparsity=0.5, fixed_length=None):
     '''
     Adds metadata to the items
     '''
@@ -217,7 +218,8 @@ def add_item_metadata(self: SynthDatasetGenerator):
             all_item_metadata,
             l1_col_name='item_id',
             l2_col_name='metadata_id',
-            sparsity=0.5
+            sparsity=sparsity,
+            fixed_length=fixed_length
         ),
         element_id_column='item_id',
         feature_column='metadata_id'
@@ -245,19 +247,17 @@ def gen_metadata(self:SynthDatasetGenerator, n_user_metadata:int, n_item_metadat
 
 @patch
 def print_dataset_components(self:SynthDatasetGenerator,
-                             print_added_n_deleted:bool,
                              add_user_metadata:bool,
                              add_item_metadata:bool):
     '''
     Prints the Dataset components
     '''
-    if print_added_n_deleted:
-        print('added users: {}\t deleted users: {}'.format(self.users_added, self.users_deleted))
-        print('added items: {}\t deleted items: {}'.format(self.items_added, self.items_deleted))
-        print('users before:\t{}\nusers after:\t{}'.format(self.before['user_id'], self.after['user_id']))
-        print('items before:\t{}\nitems after:\t{}'.format(self.before['item_id'], self.after['item_id']))
-        if add_user_metadata: print('added user features: {}\t deleted user features: {}'.format(self.added_user_metadata, self.deleted_user_metadata))
-        if add_item_metadata: print('added item features: {}\t deleted item features: {}'.format(self.added_item_metadata, self.deleted_item_metadata))
+    print('added users: {}\t deleted users: {}'.format(self.users_added, self.users_deleted))
+    print('added items: {}\t deleted items: {}'.format(self.items_added, self.items_deleted))
+    print('users before:\t{}\nusers after:\t{}'.format(self.before['user_id'], self.after['user_id']))
+    print('items before:\t{}\nitems after:\t{}'.format(self.before['item_id'], self.after['item_id']))
+    if add_user_metadata: print('added user features: {}\t deleted user features: {}'.format(self.added_user_metadata, self.deleted_user_metadata))
+    if add_item_metadata: print('added item features: {}\t deleted item features: {}'.format(self.added_item_metadata, self.deleted_item_metadata))
 
 @patch
 def gen_before_n_after_datasets(self:SynthDatasetGenerator):
@@ -269,24 +269,27 @@ def gen_before_n_after_datasets(self:SynthDatasetGenerator):
     try:
         self.before['user_id'] = exclude_element(self.all_users, self.users_added)
         self.before['item_id'] = exclude_element(self.all_items, self.items_added)
+
         self.after['user_id'] = exclude_element(self.all_users, self.users_deleted)
         self.after['item_id'] = exclude_element(self.all_items, self.items_deleted)
+
     except:
         print('One of the elements was empty')
 
 # Cell
 @patch
 def gen_synth_dataset(self:SynthDatasetGenerator,
-                        n_users:int = 10,
-                        n_items:int = 10,
-                        max_added:int = 3,
-                        max_deleted:int = 3,
-                        print_added_n_deleted:bool = False,
-                        add_user_metadata:bool = False,
-                        add_item_metadata:bool = False,
-                        n_user_metadata:int = 10,
-                        n_item_metadata:int = 10
-                       ):
+                      n_users:int = 10,
+                      n_items:int = 10,
+                      max_added:int = 3,
+                      max_deleted:int = 3,
+                      print_added_n_deleted:bool = False,
+                      add_user_metadata:bool = False,
+                      add_item_metadata:bool = False,
+                      n_user_metadata:int = 10,
+                      n_item_metadata:int = 10,
+                      sparsity = 0.2,
+                      fixed_length = None):
     '''
     This function generates two **datasets** to simulate changes through time from one dataset.
     The first generated **dataset** is the state from the data in a time *t* and the second dataset
@@ -313,32 +316,82 @@ def gen_synth_dataset(self:SynthDatasetGenerator,
 
     self.gen_before_n_after_datasets()
 
-    if add_user_metadata: self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata,
+    if add_user_metadata:
+        self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata,
                                                                                    max_added=max_added,
                                                                                    max_deleted=max_deleted)
+        self.before['user_metadata'] = exclude_element(self.all_user_metadata, self.added_user_metadata)
+        self.after['user_metadata'] = exclude_element(self.all_user_metadata, self.deleted_user_metadata)
 
-    if add_item_metadata: self.added_item_metadata, self.deleted_item_metadata = gen_added_n_deleted(self.all_item_metadata,
+        # generates user metadata for the current state of the dataset
+        self.before['user_metadata_interaction'] = gen_metadata_from_df(gen_interactions(self.before['user_id'],
+                                                                                         self.before['user_metadata'],
+                                                                                         l1_col_name='user_id',
+                                                                                         l2_col_name='metadata_id',
+                                                                                         sparsity=sparsity,
+                                                                                         fixed_length=fixed_length),
+                                                                        element_id_column='user_id',
+                                                                        metadata_column='metadata_id')
+        # generates user metadata for the next state from the dataset of the dataset
+        self.after['user_metadata_interaction'] = gen_metadata_from_df(gen_interactions(self.after['user_id'],
+                                                                                         self.after['user_metadata'],
+                                                                                         l1_col_name='user_id',
+                                                                                         l2_col_name='metadata_id',
+                                                                                         sparsity=sparsity,
+                                                                                         fixed_length=fixed_length),
+                                                                        element_id_column='user_id',
+                                                                        metadata_column='metadata_id')
+
+    if add_item_metadata:
+        self.added_item_metadata, self.deleted_item_metadata = gen_added_n_deleted(self.all_item_metadata,
                                                                                    max_added=max_added,
                                                                                    max_deleted=max_deleted)
-    self.print_dataset_components(print_added_n_deleted, add_user_metadata, add_item_metadata)
+        self.before['item_metadata'] = exclude_element(self.all_item_metadata, self.added_item_metadata)
+        self.after['item_metadata'] = exclude_element(self.all_item_metadata, self.deleted_item_metadata)
+
+        # generates user metadata for the current state of the dataset
+        self.before['item_metadata_interaction'] = gen_metadata_from_df(gen_interactions(self.before['item_id'],
+                                                                                         self.before['item_metadata'],
+                                                                                         l1_col_name='item_id',
+                                                                                         l2_col_name='metadata_id',
+                                                                                         sparsity=sparsity,
+                                                                                         fixed_length=fixed_length),
+                                                                        element_id_column='item_id',
+                                                                        metadata_column='metadata_id')
+        # generates item metadata for the next state from the dataset of the dataset
+        self.after['item_metadata_interaction'] = gen_metadata_from_df(gen_interactions(self.after['item_id'],
+                                                                                         self.after['item_metadata'],
+                                                                                         l1_col_name='item_id',
+                                                                                         l2_col_name='metadata_id',
+                                                                                         sparsity=sparsity,
+                                                                                         fixed_length=fixed_length),
+                                                                        element_id_column='item_id',
+                                                                        metadata_column='metadata_id')
+
+    if print_added_n_deleted: self.print_dataset_components(add_user_metadata, add_item_metadata)
 
 # Cell
 @patch
 def gen_user_item_interactions(self:SynthDatasetGenerator,
-                                 new:bool = False,
+                                 tplus:bool = False,
                                  sparsity:float = 0.5,
                                  feedback:bool = True,
                                  timestamp:bool = True) -> pd.DataFrame:
     '''
-    Builds interactions between users and items. If ```new=False``` the interactions build will be based on
+    Builds interactions between users and items. If ```tlus=False``` the interactions build will be based on
     the original state of the dataset, else it will be based on the new state of the dataset, with the added
     and deleted users and items respectively
     '''
-    if new:
+    if tplus:
         interactions = gen_interactions(self.after['user_id'], self.after['item_id'], sparsity=sparsity, feedback=feedback, timestamp=timestamp)
     else:
         interactions = gen_interactions(self.before['user_id'], self.before['item_id'], sparsity=sparsity, feedback=feedback, timestamp=timestamp)
     return interactions
+
+# Cell
+# @patch
+# def gen_user_metadata_interactions(self: SynthDatasetGenerator, sparsity=0.5, fixed_length=None):
+#     before_metadata =
 
 # Cell
 @patch
