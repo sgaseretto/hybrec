@@ -2,7 +2,7 @@
 
 __all__ = ['df_highlight_interaction', 'df_color_positive_interaction', 'gen_values', 'gen_added_n_deleted',
            'exclude_element', 'gen_interactions', 'gen_random_interactions', 'gen_fixed_interactions',
-           'gen_metadata_from_df', 'SynthDatasetGenerator']
+           'gen_metadata_from_df', 'gen_metadata_df', 'SynthDatasetGenerator']
 
 # Cell
 import pandas as pd
@@ -160,6 +160,21 @@ def gen_metadata_from_df(metadata_interactions_df:pd.DataFrame, element_id_colum
         if tolist: metadata_list = metadata_list.tolist()
         tuples.append((e, metadata_list))
     return tuples
+
+# Cell
+def gen_metadata_df(element_metadata_list:list, element_name:str, metadata_name:str='metadata_id') -> pd.DataFrame:
+    '''
+    Takes the elements with its metadata and generates a Dataframe with the interactions
+    @element_metadata_list: a list of tuples that contain an element and a list its corresponding metadata
+    @element_name: the name of the element that has metadata assigned
+
+    '''
+    df_dict = {element_name:[], metadata_name:[]}
+    for t in element_metadata_list:
+        for m in t[1]:
+            df_dict[element_name].append(t[0])
+            df_dict[metadata_name].append(m)
+    return pd.DataFrame(df_dict)
 
 # Cell
 class SynthDatasetGenerator():
@@ -387,11 +402,6 @@ def gen_user_item_interactions(self:SynthDatasetGenerator,
     else:
         interactions = gen_interactions(self.before['user_id'], self.before['item_id'], sparsity=sparsity, feedback=feedback, timestamp=timestamp)
     return interactions
-
-# Cell
-# @patch
-# def gen_user_metadata_interactions(self: SynthDatasetGenerator, sparsity=0.5, fixed_length=None):
-#     before_metadata =
 
 # Cell
 @patch
