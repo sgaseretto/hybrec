@@ -201,6 +201,11 @@ class SynthDatasetGenerator():
         self.deleted_item_metadata = []
         self.added_item_metadata = []
 
+        self.common_users_btw_states = []
+        self.common_items_btw_states = []
+        self.common_user_metadata_btw_states = []
+        self.common_item_metadata_btw_states = []
+
 # Cell
 
 @patch
@@ -331,6 +336,12 @@ def gen_synth_dataset(self:SynthDatasetGenerator,
 
     self.gen_before_n_after_datasets()
 
+    self.common_users_btw_states = exclude_element(self.all_users, self.users_added)
+    self.common_users_btw_states = exclude_element(self.common_users_btw_states, self.users_deleted)
+    self.common_items_btw_states = exclude_element(self.all_items, self.items_added)
+    self.common_items_btw_states = exclude_element(self.common_items_btw_states, self.items_deleted)
+
+
     if add_user_metadata:
         self.added_user_metadata, self.deleted_user_metadata = gen_added_n_deleted(self.all_user_metadata,
                                                                                    max_added=max_added,
@@ -356,6 +367,8 @@ def gen_synth_dataset(self:SynthDatasetGenerator,
                                                                                          fixed_length=fixed_length),
                                                                         element_id_column='user_id',
                                                                         metadata_column='metadata_id')
+        self.common_user_metadata_btw_states = exclude_element(self.all_user_metadata, self.added_user_metadata)
+        self.common_user_metadata_btw_states = exclude_element(self.common_user_metadata_btw_states, self.deleted_user_metadata)
 
     if add_item_metadata:
         self.added_item_metadata, self.deleted_item_metadata = gen_added_n_deleted(self.all_item_metadata,
@@ -382,6 +395,8 @@ def gen_synth_dataset(self:SynthDatasetGenerator,
                                                                                          fixed_length=fixed_length),
                                                                         element_id_column='item_id',
                                                                         metadata_column='metadata_id')
+        self.common_item_metadata_btw_states = exclude_element(self.all_item_metadata, self.added_item_metadata)
+        self.common_item_metadata_btw_states = exclude_element(self.common_item_metadata_btw_states, self.deleted_item_metadata)
 
     if print_added_n_deleted: self.print_dataset_components(add_user_metadata, add_item_metadata)
 
