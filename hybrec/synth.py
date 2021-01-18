@@ -72,13 +72,14 @@ def exclude_element(l:list, values_to_exclude:list, shuffle:bool = False) -> lis
 
 # Cell
 def gen_interactions(l1:list,
-                       l2:list,
-                       l1_col_name:str = 'user_id',
-                       l2_col_name:str = 'item_id',
-                       sparsity:float = 0.5,
-                       feedback:bool = False,
-                       timestamp:bool = False,
-                       fixed_length:int=None) -> pd.DataFrame:
+                     l2:list,
+                     l1_col_name:str = 'user_id',
+                     l2_col_name:str = 'item_id',
+                     sparsity:float = 0.5,
+                     feedback:bool = False,
+                     timestamp:bool = False,
+                     fixed_length:int=None,
+                     none_interactions:bool=False) -> pd.DataFrame:
     '''
     Generates interactions between l1 and l2.
     The sparsity determines how sparse this interactions will be.
@@ -86,12 +87,13 @@ def gen_interactions(l1:list,
     If fixed_length is not None, it will be taken over sparsity
     If feedback equals **True** a column with feedback of one is added
     If timestamp equals **True** a column with a timestamp is added in order to determine the order in which each interaction occurred
+    If none_interactions**True** then if an item en l1 does not have any interactions, one dummy interaction with **None** will be genrated
     '''
     interactions = {l1_col_name:[], l2_col_name:[]} # diccionario de interacciones entre los elementos de l1 y l2
     if feedback: interactions['feedback']=[]
     if timestamp: interactions['timestamp']=[]
     if fixed_length == None:
-        interactions = gen_random_interactions(l1,l2, interactions, l1_col_name, l2_col_name, sparsity, feedback, timestamp)
+        interactions = gen_random_interactions(l1,l2, interactions, l1_col_name, l2_col_name, sparsity, feedback, timestamp, none_interactions)
     else:
         interactions = gen_fixed_interactions(l1, l2, interactions, l1_col_name, l2_col_name, fixed_length, feedback, timestamp)
 
@@ -105,18 +107,27 @@ def gen_random_interactions(l1:list,
                               l2_col_name:str = 'item_id',
                               sparsity:float = 0.5,
                               feedback:bool = False,
-                              timestamp:bool = False) -> dict:
+                              timestamp:bool = False,
+                              none_interactions:bool=False) -> dict:
     '''
     Generates random interactions between l1 and l2.
     Each element in l1 will interact once with 0 or up to **len(l2)** elements in l2.
     '''
     for i in l1:
+        x = 0
         for j in l2:
             if random.random() < sparsity:
                 interactions[l1_col_name].append(i)
                 interactions[l2_col_name].append(j)
+                x += 1
                 if feedback: interactions['feedback'].append(1)
                 if timestamp: interactions['timestamp'].append(datetime.timestamp(datetime.now()))
+        # print(x)
+        if none_interactions == True and x == 0:
+            interactions[l1_col_name].append(i)
+            interactions[l2_col_name].append(None)
+            if feedback: interactions['feedback'].append(1)
+            if timestamp: interactions['timestamp'].append(datetime.timestamp(datetime.now()))
 
     return interactions
 
@@ -148,7 +159,7 @@ def gen_fixed_interactions(l1:list,
     return interactions
 
 # Cell
-def gen_metadata_from_df(metadata_interactions_df:pd.DataFrame, element_id_column:str, metadata_column:str, tolist=True) -> [tuple]:
+def gen_metadata_from_df(metadata_interactions_df:pd.DataFrame, element_id_column:str, metadata_column:str, tolist:bool=True) -> [tuple]:
     '''
     Builds tuples of elements and its metadata to build the dataset
     '''
@@ -157,7 +168,7 @@ def gen_metadata_from_df(metadata_interactions_df:pd.DataFrame, element_id_colum
     for e in unique_elements:
         filtered_rows = metadata_interactions_df[metadata_interactions_df[element_id_column] == e]
         metadata_list = filtered_rows[metadata_column].unique()
-        if tolist: metadata_list = metadata_list.tolist()
+        if tolist: metadata_list = [metadata for metadata in metadata_list.tolist() if metadata != None ]
         tuples.append((e, metadata_list))
     return tuples
 
